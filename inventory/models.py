@@ -7,6 +7,7 @@ class Product(models.Model):
     current_stock = models.IntegerField(default=0)
     reorder_level = models.IntegerField(default=10)
     is_active = models.BooleanField(default=True)
+    price = models.DecimalField(max_digits=10,decimal_places=2,default=0)
 
     def __str__(self):
         return f"{self.name} ({self.current_stock})"
@@ -37,6 +38,7 @@ class Product(models.Model):
                 movement_type=movement_type,
                 performed_by=user
             )
+        self.refresh_from_db()
 
 
 class StockMovement(models.Model):
