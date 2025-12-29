@@ -11,6 +11,7 @@ class Payment(models.Model):
         ('UPI', 'UPI'),
         ('BANK', 'Bank Transfer'),
         ('CARD', 'Card'),
+        ('REFUND', 'Refund'),
     )
 
     order = models.ForeignKey(
@@ -55,3 +56,6 @@ class Payment(models.Model):
 
     def outstanding_amount(self):
         return self.total_amount() - self.total_paid()
+    
+
+

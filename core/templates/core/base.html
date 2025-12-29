@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ops System</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen flex">
+<!-- Global Loader -->
+<div id="global-loader"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+
+    <div class="flex flex-col items-center gap-4">
+        <div class="h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-white text-sm">Loading...</p>
+    </div>
+
+</div>
+
+
+{% if user.is_authenticated %}
+<!-- SIDEBAR -->
+<aside class="w-64 bg-slate-900 text-white min-h-screen p-6">
+    <h2 class="text-xl font-bold mb-8">Ops System</h2>
+
+    <nav class="space-y-4">
+        <a href="/" class="block hover:text-blue-400">Dashboard</a>
+        <a href="/tasks/" class="block hover:text-blue-400">My Tasks</a>
+        <a href="/orders/" class="block hover:text-blue-400">Orders</a>
+        <a href="/payments/" class="block hover:text-blue-400">Payments</a>
+
+        {% if user.is_superuser %}
+        <a href="/admin/" class="block text-red-400 font-semibold">Admin Panel</a>
+        {% endif %}
+
+        <a href="/logout/" class="block text-yellow-300">Logout</a>
+    </nav>
+</aside>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 p-8">
+    {% block content %}{% endblock %}
+</main>
+
+
+<script>
+    const loader = document.getElementById("global-loader");
+
+    // Show loader on page load
+    window.addEventListener("load", () => {
+        loader.classList.add("hidden");
+    });
+
+    // Show loader when clicking links
+    document.addEventListener("click", (e) => {
+        const link = e.target.closest("a");
+        if (link && link.getAttribute("href") && !link.getAttribute("target")) {
+            loader.classList.remove("hidden");
+            loader.classList.add("flex");
+        }
+    });
+
+    // Show loader on form submit
+    document.addEventListener("submit", () => {
+        loader.classList.remove("hidden");
+        loader.classList.add("flex");
+    });
+</script>
+
+</body>
+</html>

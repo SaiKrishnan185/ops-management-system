@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Ops System{% endblock %}</title>
+</head>
+<body>
+
+<header>
+    <h2>Internal Operations System</h2>
+
+    <nav>
+        {% if request.user.is_authenticated %}
+            {% if request.user.userprofile.role == 'ADMIN' %}
+                <a href="/dashboard/admin/">Admin Dashboard</a>
+            {% endif %}
+
+            {% if request.user.userprofile.role == 'STAFF' %}
+                <a href="/dashboard/staff/">My Dashboard</a>
+            {% endif %}
+
+            <a href="/admin/logout/">Logout</a>
+        {% endif %}
+    </nav>
+
+    <hr>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

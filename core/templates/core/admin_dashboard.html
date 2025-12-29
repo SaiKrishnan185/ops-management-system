@@ -1,0 +1,53 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+
+<!-- Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Orders Today</p>
+        <p class="text-3xl font-bold">{{ orders_today }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Orders This Week</p>
+        <p class="text-3xl font-bold">{{ orders_week }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Pending Orders</p>
+        <p class="text-3xl font-bold text-orange-600">{{ orders_pending }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Pending Tasks</p>
+        <p class="text-3xl font-bold">{{ tasks_pending }}</p>
+    </div>
+
+</div>
+
+<!-- Quick Actions -->
+<div class="bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+
+    <div class="flex flex-wrap gap-4">
+        <a href="/admin/orders/order/add/"
+           class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            + New Order
+        </a>
+
+        <a href="/admin/inventory/product/add/"
+           class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+            + Add Product
+        </a>
+
+        <a href="/admin/"
+           class="bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-800">
+            Open Admin Panel
+        </a>
+    </div>
+</div>
+
+{% endblock %}

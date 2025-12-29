@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">My Dashboard</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Pending Tasks</p>
+        <p class="text-4xl font-bold text-orange-600">{{ tasks_pending }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <p class="text-gray-500">Completed Today</p>
+        <p class="text-4xl font-bold text-green-600">{{ tasks_completed_today }}</p>
+    </div>
+
+</div>
+
+<div class="mt-8">
+    <a href="{% url 'my_tasks' %}"
+       class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700">
+        View My Tasks →
+    </a>
+</div>
+
+{% endblock %}

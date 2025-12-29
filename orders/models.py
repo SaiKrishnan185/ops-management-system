@@ -1,7 +1,9 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from inventory.models import Product
-from django.db import transaction
+from decimal import Decimal
+from django.db.models import Sum
+
 
 class Order(models.Model):
 
@@ -15,66 +17,90 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=100)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='NEW'
     )
+
     assigned_to = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Order #{self.id} - {self.customer_name}"
-    
+
+    # -----------------------------
+    # ORDER CREATION (SINGLE SOURCE OF TRUTH)
+    # -----------------------------
     def create_order(self, user=None):
-        from inventory.models import Product
+        """
+        1. Reserve stock
+        2. Create tasks from templates
+        3. Status remains NEW until tasks move it forward
+        """
+        from tasks.models import TaskTemplate, Task
 
         with transaction.atomic():
-            # Lock product row
-            product = (
-                Product.objects
-                .select_for_update()
-                .get(pk=self.product.pk)
-            )
+            product = Product.objects.select_for_update().get(pk=self.product.pk)
 
             if product.current_stock < self.quantity:
                 raise ValueError("Insufficient stock to place order")
 
-            # Deduct stock safely
-            product.adjust_stock(   
+            # Reserve stock
+            product.adjust_stock(
                 quantity=self.quantity,
                 movement_type='OUT',
                 user=user
             )
 
-            self.status = 'IN_PROGRESS'
+            self.status = 'NEW'
             self.save()
-        
-    def complete(self):
-        if self.status != 'IN_PROGRESS':
-            raise ValueError("Only in-progress orders can be completed")
 
-        self.status = 'COMPLETED'
-        self.save()
+            # Auto-create tasks
+            templates = (
+                TaskTemplate.objects
+                .filter(product=self.product)
+                .order_by('order_sequence')
+            )
 
+            for template in templates:
+                Task.objects.create(
+                    title=template.title,
+                    order=self
+                )
 
+    # -----------------------------
+    # PAYMENTS
+    # -----------------------------
+    def total_paid(self):
+        return (
+            self.payments.aggregate(total=Sum('amount'))['total']
+            or Decimal('0.00')
+        )
+
+    def total_amount(self):
+        return self.quantity * self.product.price
+
+    # -----------------------------
+    # CANCELLATION
+    # -----------------------------
     def cancel(self, user=None):
-        if self.status not in ['NEW', 'IN_PROGRESS']:
-            raise ValueError("Only active orders can be cancelled")
+        if self.status == 'COMPLETED':
+            raise ValueError("Completed orders cannot be cancelled")
 
-        from inventory.models import Product
+        if self.status == 'CANCELLED':
+            return  # Idempotent
 
         with transaction.atomic():
-            product = (
-                Product.objects
-                .select_for_update()
-                .get(pk=self.product.pk)
-            )
+            Order.objects.select_for_update().get(pk=self.pk)
+            product = Product.objects.select_for_update().get(pk=self.product.pk)
 
             # Return stock
             product.adjust_stock(
@@ -83,6 +109,35 @@ class Order(models.Model):
                 user=user
             )
 
+            # Refund if needed
+            self.refund_order(user=user)
+
+            # Delete tasks
+            self.tasks.all().delete()
+
             self.status = 'CANCELLED'
             self.save()
 
+    # -----------------------------
+    # REFUNDS
+    # -----------------------------
+    def refund_order(self, user=None):
+        from payments.models import Payment
+
+        if Payment.objects.filter(
+            order=self,
+            payment_mode='REFUND'
+        ).exists():
+            return
+
+        total_paid = self.total_paid()
+        if total_paid <= Decimal('0.00'):
+            return
+
+        Payment.objects.create(
+            order=self,
+            amount=-total_paid,
+            payment_mode='REFUND',
+            received_by=user,
+            notes='Order cancelled – refund issued'
+        )
