@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-100 min-h-screen flex">
+<body class="bg-slate-100 h-screen overflow-hidden flex">
 <!-- Global Loader -->
 <div id="global-loader"
-     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40  hidden">
 
     <div class="flex flex-col items-center gap-4">
         <div class="h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -23,29 +23,132 @@
 
 {% if user.is_authenticated %}
 <!-- SIDEBAR -->
-<aside class="w-64 bg-slate-900 text-white min-h-screen p-6">
-    <h2 class="text-xl font-bold mb-8">Ops System</h2>
+<aside class="w-64 bg-slate-900 text-white h-screen flex flex-col">
 
-    <nav class="space-y-4">
-        <a href="/" class="block hover:text-blue-400">Dashboard</a>
-        <a href="/tasks/" class="block hover:text-blue-400">My Tasks</a>
-        <a href="/orders/" class="block hover:text-blue-400">Orders</a>
-        <a href="/payments/" class="block hover:text-blue-400">Payments</a>
+    <!-- TOP -->
+    <div class="p-6">
+        <h2 class="text-xl font-bold mb-8">Ops System</h2>
 
-        {% if user.is_superuser %}
-        <a href="/admin/" class="block text-red-400 font-semibold">Admin Panel</a>
-        {% endif %}
+        <nav class="space-y-4">
+            <!-- Dashboard -->
+            <a href="/"
+               class="flex items-center gap-3 px-3 py-2 rounded
+               {% if request.path == '/' %}
+                   bg-blue-600 text-white
+               {% else %}
+                   text-slate-300 hover:bg-slate-800
+               {% endif %}">
+                🏠 Dashboard
+            </a>
 
-        <a href="/logout/" class="block text-yellow-300">Logout</a>
-    </nav>
+            <!-- Tasks -->
+            <a href="/tasks/"
+               class="flex items-center gap-3 px-3 py-2 rounded
+               {% if request.path|slice:':7' == '/tasks/' %}
+                   bg-blue-600 text-white
+               {% else %}
+                   text-slate-300 hover:bg-slate-800
+               {% endif %}">
+                ✅ My Tasks
+            </a>
+
+            <!-- Orders -->
+            <a href="/orders/"
+               class="flex items-center gap-3 px-3 py-2 rounded
+               {% if request.path|slice:':8' == '/orders/' %}
+                   bg-blue-600 text-white
+               {% else %}
+                   text-slate-300 hover:bg-slate-800
+               {% endif %}">
+                📦 Orders
+            </a>
+
+            {% if user.is_superuser %}
+            <!-- Payments -->
+            <a href="/payments/"
+               class="flex items-center gap-3 px-3 py-2 rounded
+               {% if request.path|slice:':10' == '/payments/' %}
+                   bg-blue-600 text-white
+               {% else %}
+                   text-slate-300 hover:bg-slate-800
+               {% endif %}">
+                💰 Payments
+            </a>
+            
+            <a href="/admin/"
+               class="flex items-center gap-3 px-3 py-2 rounded
+               text-red-300 hover:bg-red-900/30 hover:text-red-200 transition">
+                ⚙ Admin Panel
+            </a>
+
+            {% endif %}
+
+            <a href="/logout/"
+                class="flex items-center gap-3 px-3 py-2 rounded
+                        text-yellow-300 hover:bg-yellow-900/30 hover:text-yellow-200 transition">
+                    <!-- Logout Icon -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <path d="M16 17l5-5-5-5"></path>
+                        <path d="M21 12H9"></path>
+                    </svg>
+                    Logout
+                </a>
+        </nav>
+    </div>
+
+    <!-- SPACER -->
+    <div class="flex-1"></div>
+
+    <!-- BOTTOM USER INFO -->
+    <div class="border-t border-slate-700 p-4 flex items-center gap-3">
+
+        <!-- Avatar -->
+        <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center font-bold">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+
+        <!-- User Info -->
+        <div class="text-sm leading-tight">
+            <p class="font-semibold">
+                {{ user.get_full_name|default:user.username }}
+            </p>
+            <br>
+
+            {% if user.is_superuser %}
+                <span class="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded">
+                    ADMIN
+                </span>
+            {% else %}
+                <span class="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded">
+                    STAFF
+                </span>
+            {% endif %}
+        </div>
+
+    </div>
+
 </aside>
 {% endif %}
 
 <!-- MAIN CONTENT -->
-<main class="flex-1 p-8">
+<main class="flex-1 p-8 overflow-y-auto">
     {% block content %}{% endblock %}
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Auto refresh dashboard every 30 seconds
+    if (window.location.pathname === "/") {
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    }
+</script>
+
+{% block scripts %}{% endblock %}
 
 <script>
     const loader = document.getElementById("global-loader");
@@ -70,6 +173,8 @@
         loader.classList.add("flex");
     });
 </script>
+
+
 
 </body>
 </html>

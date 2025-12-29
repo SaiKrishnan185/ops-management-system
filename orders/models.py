@@ -87,6 +87,9 @@ class Order(models.Model):
 
     def total_amount(self):
         return self.quantity * self.product.price
+    
+    def outstanding_amount(self):
+        return self.total_amount() - self.total_paid()
 
     # -----------------------------
     # CANCELLATION

@@ -1,53 +1,190 @@
 {% extends "core/base.html" %}
 {% block content %}
 
-<h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+<h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
-<!-- Metrics -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-
-    <div class="bg-white shadow rounded-lg p-6">
+<div class="grid grid-cols-3 gap-6 mb-10">
+    <div class="bg-white p-6 rounded shadow">
         <p class="text-gray-500">Orders Today</p>
         <p class="text-3xl font-bold">{{ orders_today }}</p>
     </div>
-
-    <div class="bg-white shadow rounded-lg p-6">
-        <p class="text-gray-500">Orders This Week</p>
-        <p class="text-3xl font-bold">{{ orders_week }}</p>
-    </div>
-
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white p-6 rounded shadow">
         <p class="text-gray-500">Pending Orders</p>
-        <p class="text-3xl font-bold text-orange-600">{{ orders_pending }}</p>
+        <p class="text-3xl font-bold">{{ orders_pending }}</p>
     </div>
-
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white p-6 rounded shadow">
         <p class="text-gray-500">Pending Tasks</p>
         <p class="text-3xl font-bold">{{ tasks_pending }}</p>
     </div>
-
 </div>
 
-<!-- Quick Actions -->
-<div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+<div class="grid grid-cols-2 gap-8">
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-4">Orders (Last 7 Days)</h2>
+        <div class="relative h-64">
+            <canvas id="ordersChart"></canvas>
+        </div>
+    </div>
 
-    <div class="flex flex-wrap gap-4">
-        <a href="/admin/orders/order/add/"
-           class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-            + New Order
-        </a>
-
-        <a href="/admin/inventory/product/add/"
-           class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
-            + Add Product
-        </a>
-
-        <a href="/admin/"
-           class="bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-800">
-            Open Admin Panel
-        </a>
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-4">Task Status</h2>
+        <div class="relative h-64">
+            <canvas id="tasksChart"></canvas>
+        </div>
     </div>
 </div>
+<br>
+<div class="bg-white p-6 rounded shadow mb-8">
+    <h3 class="font-semibold mb-2">Weekly Comparison</h3>
+
+    <div class="flex justify-between text-sm">
+        <span>This Week: <b>{{ this_week_orders }}</b></span>
+        <span>Last Week: <b>{{ last_week_orders }}</b></span>
+    </div>
+
+    <p class="mt-3 text-lg font-bold
+        {% if week_change >= 0 %}
+            text-green-600
+        {% else %}
+            text-red-600
+        {% endif %}
+    ">
+        {% if week_change >= 0 %}▲{% else %}▼{% endif %}
+        {{ week_percent }}%
+        <span class="text-sm font-normal text-gray-500">
+            vs last week
+        </span>
+    </p>
+</div>
+<br>
+<h2 class="text-xl font-semibold mb-4">Payment Summary</h2>
+
+<div class="grid grid-cols-4 gap-6 mb-10">
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Payments Today</p>
+        <p class="text-2xl font-bold text-green-600">
+            ₹{{ payments_today }}
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Payments (7 Days)</p>
+        <p class="text-2xl font-bold text-green-700">
+            ₹{{ payments_week }}
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Refunds Issued</p>
+        <p class="text-2xl font-bold text-red-500">
+            ₹{{ refunds_total }}
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Outstanding Payments</p>
+        <p class="text-2xl font-bold text-orange-500">
+            ₹{{ outstanding_amount }}
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Net Revenue</p>
+        <p class="text-2xl font-bold text-blue-600">
+            ₹{{ net_revenue }}
+        </p>
+    </div>
+
+</div>
+<br>
+<div class="bg-white p-6 rounded shadow mt-10">
+    <h2 class="text-lg font-semibold mb-4">Outstanding Payments</h2>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b text-gray-600">
+                <th class="text-left py-2">Order</th>
+                <th class="text-left">Customer</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Paid</th>
+                <th class="text-right">Due</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in outstanding_orders %}
+            <tr class="border-b">
+                <td class="py-2">#{{ order.id }}</td>
+                <td>{{ order.customer_name }}</td>
+                <td class="text-right">₹{{ order.total_amount }}</td>
+                <td class="text-right">₹{{ order.total_paid }}</td>
+                <td class="text-right font-semibold text-red-500">
+                    ₹{{ order.outstanding_amount }}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-4 text-gray-500">
+                    No outstanding payments 🎉
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
 
 {% endblock %}
+
+
+{% block scripts %}
+{{ order_labels|json_script:"order-labels" }}
+{{ order_counts|json_script:"order-counts" }}
+{{ task_labels|json_script:"task-labels" }}
+{{ task_counts|json_script:"task-counts" }}
+
+<script>
+    const orderLabels = JSON.parse(document.getElementById("order-labels").textContent);
+    const orderCounts = JSON.parse(document.getElementById("order-counts").textContent);
+    const taskLabels = JSON.parse(document.getElementById("task-labels").textContent);
+    const taskCounts = JSON.parse(document.getElementById("task-counts").textContent);
+
+    new Chart(document.getElementById("ordersChart"), {
+        type: "line",
+        data: {
+            labels: orderLabels,
+            datasets: [{
+                label: "Orders",
+                data: orderCounts,
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37,99,235,0.1)",
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    new Chart(document.getElementById("tasksChart"), {
+        type: "doughnut",
+        data: {
+            labels: taskLabels,
+            datasets: [{
+                data: taskCounts,
+                backgroundColor: ["#facc15", "#22c55e", "#ef4444"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+</script>
+{% endblock %}
+
+

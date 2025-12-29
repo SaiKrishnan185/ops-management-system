@@ -1,10 +1,10 @@
 {% extends "core/base.html" %}
+
 {% block content %}
 
 <h1 class="text-3xl font-bold mb-8">My Dashboard</h1>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
+<div class="grid grid-cols-2 gap-6 mb-10">
     <div class="bg-white shadow rounded-lg p-6">
         <p class="text-gray-500">Pending Tasks</p>
         <p class="text-4xl font-bold text-orange-600">{{ tasks_pending }}</p>
@@ -14,14 +14,143 @@
         <p class="text-gray-500">Completed Today</p>
         <p class="text-4xl font-bold text-green-600">{{ tasks_completed_today }}</p>
     </div>
+</div>
+
+<a href="{% url 'my_tasks' %}"
+   class="inline-block mb-10 bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700">
+    View My Tasks →
+</a>
+
+<div class="grid grid-cols-2 gap-8">
+
+    <!-- TASK STATUS -->
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-4">Task Status</h2>
+        <div class="relative h-64">
+            <canvas id="taskStatusChart"></canvas>
+        </div>
+    </div>
+
+    <!-- PENDING vs OVERDUE -->
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-4">Pending vs Overdue</h2>
+        <div class="relative h-64">
+            <canvas id="overdueChart"></canvas>
+        </div>
+    </div>
 
 </div>
 
-<div class="mt-8">
-    <a href="{% url 'my_tasks' %}"
-       class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700">
-        View My Tasks →
-    </a>
+<br>
+<!-- TASKS DUE TODAY -->
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Tasks Due Today</h2>
+
+        {% if tasks_overdue_count > 0 %}
+            <span class="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full">
+                {{ tasks_overdue_count }} overdue
+            </span>
+        {% endif %}
+    </div>
+
+    {% if tasks_due_today_count > 0 %}
+        <ul class="divide-y">
+            {% for task in tasks_due_today_list %}
+                <li class="py-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ task.title }}</p>
+                        <p class="text-sm text-gray-500">
+                            Order #{{ task.order.id }} • {{ task.order.customer_name }}
+                        </p>
+                    </div>
+
+                    <span class="text-xs px-3 py-1 rounded-full
+                        {% if task.status == 'PENDING' %}
+                            bg-yellow-100 text-yellow-700
+                        {% else %}
+                            bg-blue-100 text-blue-700
+                        {% endif %}
+                    ">
+                        {{ task.status }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% else %}
+        <div class="text-center text-gray-500 py-6">
+            🎉 No tasks due today!
+        </div>
+    {% endif %}
 </div>
 
+<!-- JSON DATA -->
+{{ task_status_labels|json_script:"task-status-labels" }}
+{{ task_status_counts|json_script:"task-status-counts" }}
+{{ overdue_labels|json_script:"overdue-labels" }}
+{{ overdue_counts|json_script:"overdue-counts" }}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const statusLabels = JSON.parse(
+        document.getElementById("task-status-labels").textContent
+    );
+    const statusCounts = JSON.parse(
+        document.getElementById("task-status-counts").textContent
+    );
+
+    const overdueLabels = JSON.parse(
+        document.getElementById("overdue-labels").textContent
+    );
+    const overdueCounts = JSON.parse(
+        document.getElementById("overdue-counts").textContent
+    );
+
+    // TASK STATUS
+    if (Array.isArray(statusCounts) && statusCounts.length > 0) {
+        new Chart(document.getElementById("taskStatusChart"), {
+            type: "doughnut",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusCounts,
+                    backgroundColor: ["#facc15", "#3b82f6", "#22c55e"]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+    }
+
+    // PENDING vs OVERDUE
+    if (Array.isArray(overdueCounts)) {
+        new Chart(document.getElementById("overdueChart"), {
+            type: "bar",
+            data: {
+                labels: overdueLabels,
+                datasets: [{
+                    label: "Tasks",
+                    data: overdueCounts,
+                    backgroundColor: ["#3b82f6", "#ef4444"]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}

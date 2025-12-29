@@ -6,7 +6,8 @@ from tasks.models import Task
 from payments.models import Payment
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
-from core.utils import order_metrics, task_metrics
+from core.utils import order_metrics, task_metrics, admin_chart_data, weekly_comparison, payment_summary, staff_task_charts, tasks_due_today
+
 
 
 @login_required
@@ -16,9 +17,22 @@ def dashboard(request):
     if request.user.is_superuser:
         context.update(order_metrics())
         context.update(task_metrics())
+        context.update(admin_chart_data())
+        context.update(weekly_comparison())
+        context.update(payment_summary())
+
+        outstanding_orders = [
+        o for o in Order.objects.exclude(status='CANCELLED')
+        if o.outstanding_amount() > 0]
+
+        context["outstanding_orders"] = outstanding_orders
+
         return render(request, 'core/admin_dashboard.html', context)
 
     context.update(task_metrics(user=request.user))
+    context.update(staff_task_charts(request.user))
+    context.update(tasks_due_today(request.user))
+    
     return render(request, 'core/staff_dashboard.html', context)
 
 
