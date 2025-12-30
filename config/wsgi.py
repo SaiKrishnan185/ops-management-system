@@ -22,6 +22,7 @@ import os
 
 class Command(BaseCommand):
     help = "Create initial admin user if not exists"
+    print(help)
 
     def handle(self, *args, **kwargs):
         username = os.getenv("DJANGO_ADMIN_USERNAME")
