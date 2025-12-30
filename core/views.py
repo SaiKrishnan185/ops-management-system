@@ -56,6 +56,8 @@ def dashboard(request):
 
 
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     if request.method == 'POST':
         user = authenticate(
             request,

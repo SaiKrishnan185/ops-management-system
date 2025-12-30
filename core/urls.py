@@ -4,7 +4,7 @@ from .views import bootstrap_admin
 from core.views import admin_products
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
 

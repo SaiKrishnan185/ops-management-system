@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'tasks',
     'payments',
     'dashboard',
-    'core'
+    'core',
+    'landing'
 ]
 
 JAZZMIN_SETTINGS = {
