@@ -6,23 +6,23 @@ class Command(BaseCommand):
     help = "Create initial admin user if not exists"
     print(help)
 
-    def handle(self, *args, **kwargs):
-        username = os.getenv("DJANGO_ADMIN_USERNAME")
-        email = os.getenv("DJANGO_ADMIN_EMAIL")
-        password = os.getenv("DJANGO_ADMIN_PASSWORD")
+    # def handle(self, *args, **kwargs):
+    #     username = os.getenv("DJANGO_ADMIN_USERNAME")
+    #     email = os.getenv("DJANGO_ADMIN_EMAIL")
+    #     password = os.getenv("DJANGO_ADMIN_PASSWORD")
 
-        if not username or not password:
-            self.stdout.write("Admin env vars not set. Skipping.")
-            return
+    #     if not username or not password:
+    #         self.stdout.write("Admin env vars not set. Skipping.")
+    #         return
 
-        if User.objects.filter(username=username).exists():
-            self.stdout.write("Admin user already exists.")
-            return
+    #     if User.objects.filter(username=username).exists():
+    #         self.stdout.write("Admin user already exists.")
+    #         return
 
-        User.objects.create_superuser(
-            username=username,
-            email=email,
-            password=password
-        )
+    #     User.objects.create_superuser(
+    #         username=username,
+    #         email=email,
+    #         password=password
+    #     )
 
-        self.stdout.write("Admin user created successfully.")
+    #     self.stdout.write("Admin user created successfully.")

@@ -9,6 +9,23 @@ from django.http import HttpResponseForbidden
 from core.utils import order_metrics, task_metrics, admin_chart_data, weekly_comparison, payment_summary, staff_task_charts, tasks_due_today
 
 
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+import os
+
+def bootstrap_admin(request):
+    if os.getenv("ALLOW_BOOTSTRAP") != "1":
+        return HttpResponse("Disabled", status=403)
+
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser(
+            "admin",
+            "saikrishnan187@gmail.com",
+            "Demo@123"
+        )
+        return HttpResponse("Admin created")
+
+    return HttpResponse("Admin already exists")
 
 @login_required
 def dashboard(request):
