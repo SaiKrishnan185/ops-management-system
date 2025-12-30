@@ -11,7 +11,7 @@
 <body class="bg-slate-100 h-screen overflow-hidden flex">
 <!-- Global Loader -->
 <div id="global-loader"
-     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40  hidden">
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 ">
 
     <div class="flex flex-col items-center gap-4">
         <div class="h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -154,7 +154,7 @@
     if (window.location.pathname === "/") {
         setTimeout(() => {
             window.location.reload();
-        }, 30000);
+        }, 60000);
     }
 </script>
 
@@ -163,24 +163,39 @@
 <script>
     const loader = document.getElementById("global-loader");
 
-    // Show loader on page load
-    window.addEventListener("load", () => {
+    function hideLoader() {
         loader.classList.add("hidden");
-    });
+        loader.classList.remove("flex");
+    }
+
+    function showLoader() {
+        loader.classList.remove("hidden");
+        loader.classList.add("flex");
+    }
+
+    // Hide loader on normal load
+    window.addEventListener("load", hideLoader);
+
+    // 🔥 IMPORTANT: Hide loader when page is restored from bfcache
+    window.addEventListener("pageshow", hideLoader);
 
     // Show loader when clicking links
     document.addEventListener("click", (e) => {
         const link = e.target.closest("a");
-        if (link && link.getAttribute("href") && !link.getAttribute("target")) {
-            loader.classList.remove("hidden");
-            loader.classList.add("flex");
+
+        if (
+            link &&
+            link.getAttribute("href") &&
+            !link.getAttribute("target") &&
+            !link.getAttribute("href").startsWith("#")
+        ) {
+            showLoader();
         }
     });
 
     // Show loader on form submit
     document.addEventListener("submit", () => {
-        loader.classList.remove("hidden");
-        loader.classList.add("flex");
+        showLoader();
     });
 </script>
 
