@@ -29,6 +29,7 @@
                     Username
                 </label>
                 <input
+                    id="id_username"
                     type="text"
                     name="username"
                     required
@@ -42,6 +43,7 @@
                     Password
                 </label>
                 <input
+                    id="id_password"
                     type="password"
                     name="password"
                     required
@@ -57,21 +59,32 @@
             </button>
         </form>
 
-        <div class="mt-6 bg-slate-100 border rounded-lg p-4 text-sm">
-            <p class="font-semibold mb-2">Demo Credentials</p>
+        <br>
+        <br>
+        <button onclick="fillAdmin()" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+            Fill Admin Credentials (DEMO)
+        </button>
 
-            <div class="mb-2">
-                <p><b>Admin</b></p>
-                <p>Username: <code>Michael</code></p>
-                <p>Password: <code>Demo@123</code></p>
-            </div>
+        <br>
+        <br>
+        <button onclick="fillStaff()" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+            Fill Staff Credentials (DEMO)
+        </button>
 
-            <div>
-                <p><b>Staff</b></p>
-                <p>Username: <code>Dwight</code></p>
-                <p>Password: <code>Demo@456</code></p>
-            </div>
-        </div>
+        <script>
+        function fillAdmin() {
+            document.getElementById("id_username").value = "Michael";
+            document.getElementById("id_password").value = "Demo@123";
+        }
+        </script>
+        
+        <script>
+        function fillStaff() {
+            document.getElementById("id_username").value = "Dwight";
+            document.getElementById("id_password").value = "Demo@456";
+        }
+        </script>
+        
 
         <!-- Footer -->
         <div class="text-center mt-6 text-sm text-slate-500">
