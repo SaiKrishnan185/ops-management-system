@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import bootstrap_admin
+from core.views import admin_products
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -14,6 +15,8 @@ urlpatterns = [
     path('tasks/<int:pk>/', views.task_detail, name='task_detail'),
     path('tasks/<int:pk>/start/', views.start_task, name='start_task'),
     path('tasks/<int:pk>/complete/', views.complete_task, name='complete_task'),
+
+    path('products/', admin_products, name='admin_products'),
 
     path("bootstrap-admin/", bootstrap_admin),
 

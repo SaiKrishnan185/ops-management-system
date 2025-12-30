@@ -73,7 +73,8 @@ class Order(models.Model):
             for template in templates:
                 Task.objects.create(
                     title=template.title,
-                    order=self
+                    order=self,
+                    assigned_to=self.assigned_to
                 )
 
     # -----------------------------
@@ -144,3 +145,22 @@ class Order(models.Model):
             received_by=user,
             notes='Order cancelled – refund issued'
         )
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        # Fetch previous value (if exists)
+        previous_assignee = None
+        if not is_new:
+            previous_assignee = (
+                Order.objects
+                .filter(pk=self.pk)
+                .values_list('assigned_to', flat=True)
+                .first()
+            )
+
+        super().save(*args, **kwargs)
+
+        # 🔥 If assignment changed → update all tasks
+        if self.assigned_to and previous_assignee != self.assigned_to:
+            self.tasks.update(assigned_to=self.assigned_to)

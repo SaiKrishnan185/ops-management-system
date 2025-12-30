@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from inventory.models import Product
 from orders.models import Order
 from tasks.models import Task
 from payments.models import Payment
@@ -84,8 +85,30 @@ def my_tasks(request):
 
 @login_required
 def orders_view(request):
-    orders = Order.objects.all()
-    return render(request, 'core/orders.html', {'orders': orders})
+    sort = request.GET.get("sort", "-created_at")
+
+    allowed_sorts = [
+        "created_at", "-created_at",
+        "status", "-status",
+        "customer_name", "-customer_name",
+        "assigned_to__username", "-assigned_to__username",
+    ]
+
+    if sort not in allowed_sorts:
+        sort = "-created_at"
+
+    orders = Order.objects.select_related(
+        "product", "assigned_to"
+    ).order_by(sort)
+
+    return render(
+        request,
+        "core/orders.html",
+        {
+            "orders": orders,
+            "current_sort": sort
+        }
+    )
 
 
 @login_required
@@ -124,3 +147,13 @@ def complete_task(request, pk):
 
     task.complete()
     return redirect('task_detail', pk=pk)
+
+def is_admin(user):
+    return user.is_superuser
+
+@user_passes_test(is_admin)
+def admin_products(request):
+    products = Product.objects.all().order_by("name")
+    return render(request, "core/admin_products.html", {
+        "products": products
+    })

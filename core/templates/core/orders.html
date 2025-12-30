@@ -1,7 +1,40 @@
 {% extends "core/base.html" %}
 {% block content %}
 
-<h1 class="text-3xl font-bold mb-6">Orders</h1>
+<div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-bold">Orders</h1>
+
+    <form method="get">
+        <select name="sort"
+                onchange="this.form.submit()"
+                class="border rounded px-3 py-2 text-sm">
+
+            <option value="-created_at" {% if current_sort == "-created_at" %}selected{% endif %}>
+                Newest First
+            </option>
+
+            <option value="created_at" {% if current_sort == "created_at" %}selected{% endif %}>
+                Oldest First
+            </option>
+
+            <option value="status" {% if current_sort == "status" %}selected{% endif %}>
+                Status (A–Z)
+            </option>
+
+            <option value="-status" {% if current_sort == "-status" %}selected{% endif %}>
+                Status (Z–A)
+            </option>
+
+            <option value="customer_name" {% if current_sort == "customer_name" %}selected{% endif %}>
+                Customer (A–Z)
+            </option>
+
+            <option value="-customer_name" {% if current_sort == "-customer_name" %}selected{% endif %}>
+                Customer (Z–A)
+            </option>
+        </select>
+    </form>
+</div>
 
 <div class="bg-white shadow rounded-lg overflow-hidden">
 <table class="min-w-full">

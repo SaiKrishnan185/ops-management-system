@@ -64,6 +64,16 @@
             </a>
 
             {% if user.is_superuser %}
+
+            <a href="/products/"
+                class="flex items-center gap-3 px-3 py-2 rounded
+                {% if request.path|slice:':16' == '/admin/products/' %}
+                    bg-blue-600 text-white
+                {% else %}
+                    text-slate-300 hover:bg-slate-800
+                {% endif %}">
+                🛒 Products
+            </a>
             <!-- Payments -->
             <a href="/payments/"
                class="flex items-center gap-3 px-3 py-2 rounded
