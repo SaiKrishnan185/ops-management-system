@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +49,39 @@ INSTALLED_APPS = [
     'dashboard',
     'core'
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Ops Management System",
+    "site_header": "Ops System Admin",
+    "site_brand": "Ops System",
+
+    "welcome_sign": "Welcome to Ops Management Admin",
+
+    "show_sidebar": True,
+    "navigation_expanded": True,
+
+    "icons": {
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+
+        "orders.Order": "fas fa-shopping-cart",
+        "payments.Payment": "fas fa-credit-card",
+        "inventory.Product": "fas fa-box",
+        "inventory.StockMovement": "fas fa-warehouse",
+        "tasks.Task": "fas fa-tasks",
+        "tasks.TaskTemplate": "fas fa-layer-group",
+    },
+
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "/", "permissions": ["auth.view_user"]},
+    ],
+
+    "hide_apps": [
+        "auth",
+    ],
+}
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -135,3 +169,5 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
+
+
