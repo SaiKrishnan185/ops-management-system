@@ -6,9 +6,9 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 👥 Role-Based Access
+### Role-Based Access
 - **Admin**
   - Create and manage orders
   - Monitor overall operations via dashboards
@@ -20,7 +20,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### 📦 Order Management
+### Order Management
 - Orders linked to products and quantities
 - Automatic stock reservation on order creation
 - Order lifecycle:
@@ -30,7 +30,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### ✅ Task Management
+### Task Management
 - Tasks linked to orders
 - Tasks cannot be assigned to cancelled or completed orders
 - Task workflow:
@@ -40,7 +40,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### 📊 Dashboards & Metrics
+### Dashboards & Metrics
 
 #### Admin Dashboard
 - Orders today
@@ -59,7 +59,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### 🧮 Inventory Management
+### Inventory Management
 - Centralized product stock tracking
 - Race-condition safe stock updates
 - Stock movements logged as immutable records
@@ -70,7 +70,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### 💰 Payments & Refunds
+### Payments & Refunds
 - Payments linked to orders
 - Immutable payment records
 - Refunds handled as compensating transactions (no edits/deletes)
@@ -78,7 +78,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-### 🎨 UI & UX
+### UI & UX
 - Clean sidebar-based layout
 - Fixed navigation, scrollable content
 - Tailwind CSS for styling
@@ -89,7 +89,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Backend**: Django (Python)
 - **Frontend**: Django Templates + Tailwind CSS
@@ -99,7 +99,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-## 🧱 Architecture Highlights
+## Architecture Highlights
 
 - Business logic inside models (not views)
 - Transaction-safe operations (`transaction.atomic`)
@@ -113,7 +113,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-## ▶️ Typical Workflow
+## Typical Workflow
 
 1. Admin creates an order
 2. Stock is reserved automatically
@@ -128,7 +128,7 @@ This project is built as a **demo-ready MVP** showcasing clean architecture, rea
 
 ---
 
-## 🎯 Purpose of This Project
+## Purpose of This Project
 
 This project is intended to:
 - Demonstrate real-world backend design
@@ -138,7 +138,7 @@ This project is intended to:
 
 ---
 
-## 📌 Notes
+## Notes
 
 - This is a demo-focused implementation
 - Mobile optimization and advanced notifications are intentionally out of scope
@@ -146,6 +146,6 @@ This project is intended to:
 
 ---
 
-## 📄 License
+## License
 
 This project is provided as a demonstration and learning reference.
